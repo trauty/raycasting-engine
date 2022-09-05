@@ -52,14 +52,21 @@ build cmake_object_order_depends_target_raycasting-engine: phony || CMakeFiles/r
 build CMakeFiles/raycasting-engine.dir/src/main.c.obj: C_COMPILER__raycasting-engine_Debug C$:/Users/traut/Desktop/raycasting-engine/src/main.c || cmake_object_order_depends_target_raycasting-engine
   DEP_FILE = CMakeFiles\raycasting-engine.dir\src\main.c.obj.d
   FLAGS = -g
-  INCLUDES = -IC:/Users/traut/Desktop/raycasting-engine/include/glfw -IC:/Users/traut/Desktop/raycasting-engine/include/glad
+  INCLUDES = -IC:/Users/traut/Desktop/raycasting-engine/include/glfw -IC:/Users/traut/Desktop/raycasting-engine/include/glad -IC:/Users/traut/Desktop/raycasting-engine/include
   OBJECT_DIR = CMakeFiles\raycasting-engine.dir
   OBJECT_FILE_DIR = CMakeFiles\raycasting-engine.dir\src
 
 build CMakeFiles/raycasting-engine.dir/src/glad.c.obj: C_COMPILER__raycasting-engine_Debug C$:/Users/traut/Desktop/raycasting-engine/src/glad.c || cmake_object_order_depends_target_raycasting-engine
   DEP_FILE = CMakeFiles\raycasting-engine.dir\src\glad.c.obj.d
   FLAGS = -g
-  INCLUDES = -IC:/Users/traut/Desktop/raycasting-engine/include/glfw -IC:/Users/traut/Desktop/raycasting-engine/include/glad
+  INCLUDES = -IC:/Users/traut/Desktop/raycasting-engine/include/glfw -IC:/Users/traut/Desktop/raycasting-engine/include/glad -IC:/Users/traut/Desktop/raycasting-engine/include
+  OBJECT_DIR = CMakeFiles\raycasting-engine.dir
+  OBJECT_FILE_DIR = CMakeFiles\raycasting-engine.dir\src
+
+build CMakeFiles/raycasting-engine.dir/src/shader.c.obj: C_COMPILER__raycasting-engine_Debug C$:/Users/traut/Desktop/raycasting-engine/src/shader.c || cmake_object_order_depends_target_raycasting-engine
+  DEP_FILE = CMakeFiles\raycasting-engine.dir\src\shader.c.obj.d
+  FLAGS = -g
+  INCLUDES = -IC:/Users/traut/Desktop/raycasting-engine/include/glfw -IC:/Users/traut/Desktop/raycasting-engine/include/glad -IC:/Users/traut/Desktop/raycasting-engine/include
   OBJECT_DIR = CMakeFiles\raycasting-engine.dir
   OBJECT_FILE_DIR = CMakeFiles\raycasting-engine.dir\src
 
@@ -71,7 +78,7 @@ build CMakeFiles/raycasting-engine.dir/src/glad.c.obj: C_COMPILER__raycasting-en
 #############################################
 # Link the executable raycasting-engine.exe
 
-build raycasting-engine.exe: C_EXECUTABLE_LINKER__raycasting-engine_Debug CMakeFiles/raycasting-engine.dir/src/main.c.obj CMakeFiles/raycasting-engine.dir/src/glad.c.obj | ../lib/libglfw3.a
+build raycasting-engine.exe: C_EXECUTABLE_LINKER__raycasting-engine_Debug CMakeFiles/raycasting-engine.dir/src/main.c.obj CMakeFiles/raycasting-engine.dir/src/glad.c.obj CMakeFiles/raycasting-engine.dir/src/shader.c.obj | ../lib/libglfw3.a
   FLAGS = -g
   LINK_FLAGS = -mwindows
   LINK_LIBRARIES = ../lib/libglfw3.a  -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32

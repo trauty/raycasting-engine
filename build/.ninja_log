@@ -1,7 +1,7 @@
 # ninja log v5
-10	734	6809210223473607	CMakeFiles/raycasting-engine.dir/src/glad.c.obj	46d519945b965b29
-13	98	6809210022662543	CMakeFiles/raycasting-engine.dir/src/main.c.obj	84a1ec13f64dd9e6
-735	875	6809210224842402	raycasting-engine.exe	5f28bf870acbc92
-11	306	6809135953611427	CMakeFiles/raycasting-engine.dir/main.cpp.obj	93a250757dfa1d43
 10	86	6809184033105698	CMakeFiles/raycasting-engine.dir/main.c.obj	45f4ff9ad5f84641
-14	169	6809214611285157	raycasting-engine.exe	1b426950e2193e00
+11	306	6809135953611427	CMakeFiles/raycasting-engine.dir/main.cpp.obj	93a250757dfa1d43
+411	683	6812673205358066	raycasting-engine.exe	b06e472445a5dc0d
+4	411	6812673202678038	CMakeFiles/raycasting-engine.dir/src/main.c.obj	8cc901f6250c0b3e
+28	740	6809891294187604	CMakeFiles/raycasting-engine.dir/src/glad.c.obj	cd8130c6ee92beb0
+11	94	6809891445396695	CMakeFiles/raycasting-engine.dir/src/shader.c.obj	1a19894a3faba530
