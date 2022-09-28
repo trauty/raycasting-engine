@@ -55,7 +55,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "c:/Users/traut/Desktop/raycasting-engine/build"
+			"value" : "c:/Users/traut/Desktop/Github Repos/raycasting-engine/build"
 		},
 		{
 			"name" : "CMAKE_CACHE_MAJOR_VERSION",
@@ -79,7 +79,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "21"
+			"value" : "22"
 		},
 		{
 			"name" : "CMAKE_CACHE_PATCH_VERSION",
@@ -91,7 +91,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "2"
+			"value" : "3"
 		},
 		{
 			"name" : "CMAKE_COMMAND",
@@ -434,6 +434,18 @@
 			"value" : "C:/msys64/mingw64/bin/dlltool.exe"
 		},
 		{
+			"name" : "CMAKE_EDIT_COMMAND",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "Path to cache edit program executable."
+				}
+			],
+			"type" : "INTERNAL",
+			"value" : "C:/Program Files/CMake/bin/cmake-gui.exe"
+		},
+		{
 			"name" : "CMAKE_EXECUTABLE_FORMAT",
 			"properties" : 
 			[
@@ -619,7 +631,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "C:/Users/traut/Desktop/raycasting-engine"
+			"value" : "C:/Users/traut/Desktop/Github Repos/raycasting-engine"
 		},
 		{
 			"name" : "CMAKE_INSTALL_PREFIX",
@@ -663,7 +675,7 @@
 				}
 			],
 			"type" : "FILEPATH",
-			"value" : "C:/msys64/mingw64/bin/ninja.exe"
+			"value" : "C:/ninja/ninja.exe"
 		},
 		{
 			"name" : "CMAKE_MODULE_LINKER_FLAGS",
@@ -854,66 +866,6 @@
 			"value" : "raycasting-engine"
 		},
 		{
-			"name" : "CMAKE_PROJECT_VERSION",
-			"properties" : 
-			[
-				{
-					"name" : "HELPSTRING",
-					"value" : "Value Computed by CMake"
-				}
-			],
-			"type" : "STATIC",
-			"value" : "0.1.0"
-		},
-		{
-			"name" : "CMAKE_PROJECT_VERSION_MAJOR",
-			"properties" : 
-			[
-				{
-					"name" : "HELPSTRING",
-					"value" : "Value Computed by CMake"
-				}
-			],
-			"type" : "STATIC",
-			"value" : "0"
-		},
-		{
-			"name" : "CMAKE_PROJECT_VERSION_MINOR",
-			"properties" : 
-			[
-				{
-					"name" : "HELPSTRING",
-					"value" : "Value Computed by CMake"
-				}
-			],
-			"type" : "STATIC",
-			"value" : "1"
-		},
-		{
-			"name" : "CMAKE_PROJECT_VERSION_PATCH",
-			"properties" : 
-			[
-				{
-					"name" : "HELPSTRING",
-					"value" : "Value Computed by CMake"
-				}
-			],
-			"type" : "STATIC",
-			"value" : "0"
-		},
-		{
-			"name" : "CMAKE_PROJECT_VERSION_TWEAK",
-			"properties" : 
-			[
-				{
-					"name" : "HELPSTRING",
-					"value" : "Value Computed by CMake"
-				}
-			],
-			"type" : "STATIC",
-			"value" : ""
-		},
-		{
 			"name" : "CMAKE_RANLIB",
 			"properties" : 
 			[
@@ -1063,7 +1015,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "C:/Program Files/CMake/share/cmake-3.21"
+			"value" : "C:/Program Files/CMake/share/cmake-3.22"
 		},
 		{
 			"name" : "CMAKE_SHARED_LINKER_FLAGS",
@@ -1299,7 +1251,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "C:/Users/traut/Desktop/raycasting-engine/build"
+			"value" : "C:/Users/traut/Desktop/Github Repos/raycasting-engine/build"
 		},
 		{
 			"name" : "raycasting-engine_IS_TOP_LEVEL",
@@ -1323,7 +1275,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "C:/Users/traut/Desktop/raycasting-engine"
+			"value" : "C:/Users/traut/Desktop/Github Repos/raycasting-engine"
 		}
 	],
 	"kind" : "cache",

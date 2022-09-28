@@ -6,10 +6,12 @@ const char* vertexShaderSource =
 
 "layout (location = 0) in vec2 aPos;\n"
 
+"uniform mat4 orthoMat;\n"
+
 "void main()\n"
 "{\n"
-"   gl_PointSize = 5.0;\n"
-"   gl_Position = vec4(aPos.x, aPos.y, 0.0, 1.0);\n"
+"   gl_PointSize = 150.0;\n"
+"   gl_Position = orthoMat * vec4(aPos.x, aPos.y, 0.0, 1.0);\n"
 "}\n\0"
 };
 

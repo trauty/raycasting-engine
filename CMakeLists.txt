@@ -10,7 +10,7 @@ src/glad.c
 src/shader.c
 )
 
-target_link_options(raycasting-engine PRIVATE -mwindows)
+#target_link_options(raycasting-engine PRIVATE -mwindows)
 
 target_link_libraries(raycasting-engine glfw)
 
