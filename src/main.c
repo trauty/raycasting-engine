@@ -16,12 +16,14 @@
 
 GLFWwindow* window = NULL;
 
-int screenWidth = 1024, screenHeight = 1024;
+int screenWidth = 1280, screenHeight = 720;
 
-float playerPosX = 512.0f, playerPosY = 512.0f;
+float playerPosX = 200.0f, playerPosY = 200.0f;
 float playerDeltaX = 0.0f, playerDeltaY = 0.0f;
 float playerAngle = 0.0f;
 float rotationSpeed = 4.0f;
+
+int maxRays = 180;
 
 float movementSpeed = 250.0f;
 
@@ -34,7 +36,7 @@ GLfloat minimapVertices[2048];
 
 GLfloat raycastVertices[2048];
 
-GLfloat worldVertices[2048];
+GLfloat worldVertices[5400];
 
 GLfloat orthoMat[16] =
 {
@@ -52,7 +54,7 @@ int map[]=
 {
     1, 1, 1, 1, 1, 1, 1, 1,
     1, 0, 1, 0, 0, 0, 0, 1,
-    1, 0, 1, 0, 0, 1, 0, 1,
+    1, 0, 1, 0, 0, 0, 0, 1,
     1, 0, 0, 0, 0, 0, 0, 1,
     1, 0, 0, 1, 1, 1, 0, 1,
     1, 0, 0, 1, 0, 0, 0, 1,
@@ -134,8 +136,8 @@ void initMinimap()
                 color = 1.0f;
             }
 
-            xOffset = x * MAP_SIZE;
-            yOffset = y * MAP_SIZE;
+            xOffset = x * MAP_SIZE / 4;
+            yOffset = y * MAP_SIZE / 4;
 
             minimapVertices[minimapArrOffset]     = xOffset;
             minimapVertices[minimapArrOffset + 1] = yOffset;
@@ -145,14 +147,14 @@ void initMinimap()
             minimapVertices[minimapArrOffset + 4] = color;
             
             minimapVertices[minimapArrOffset + 5] = xOffset;
-            minimapVertices[minimapArrOffset + 6] = yOffset + MAP_SIZE;
+            minimapVertices[minimapArrOffset + 6] = yOffset + MAP_SIZE / 4;
             
             minimapVertices[minimapArrOffset + 7] = color;
             minimapVertices[minimapArrOffset + 8] = color;
             minimapVertices[minimapArrOffset + 9] = color;
             
-            minimapVertices[minimapArrOffset + 10] = xOffset + MAP_SIZE;
-            minimapVertices[minimapArrOffset + 11] = yOffset + MAP_SIZE;
+            minimapVertices[minimapArrOffset + 10] = xOffset + MAP_SIZE / 4;
+            minimapVertices[minimapArrOffset + 11] = yOffset + MAP_SIZE / 4;
             
             minimapVertices[minimapArrOffset + 12] = color;
             minimapVertices[minimapArrOffset + 13] = color;
@@ -165,15 +167,15 @@ void initMinimap()
             minimapVertices[minimapArrOffset + 18] = color;
             minimapVertices[minimapArrOffset + 19] = color;
 
-            minimapVertices[minimapArrOffset + 20] = xOffset + MAP_SIZE;
+            minimapVertices[minimapArrOffset + 20] = xOffset + MAP_SIZE / 4;
             minimapVertices[minimapArrOffset + 21] = yOffset;
             
             minimapVertices[minimapArrOffset + 22] = color;
             minimapVertices[minimapArrOffset + 23] = color;
             minimapVertices[minimapArrOffset + 24] = color;
 
-            minimapVertices[minimapArrOffset + 25] = xOffset + MAP_SIZE;
-            minimapVertices[minimapArrOffset + 26] = yOffset + MAP_SIZE;
+            minimapVertices[minimapArrOffset + 25] = xOffset + MAP_SIZE / 4;
+            minimapVertices[minimapArrOffset + 26] = yOffset + MAP_SIZE / 4;
 
             minimapVertices[minimapArrOffset + 27] = color;
             minimapVertices[minimapArrOffset + 28] = color;
@@ -197,7 +199,7 @@ void drawRays()
     int lineVerticesOffset = 0;
     int worldVerticesOffset = 0;
 
-    rayAngle = playerAngle - DR * 30;
+    rayAngle = playerAngle - DR * 45;
     if (rayAngle < 0)
     {
         rayAngle += 2 * PI;
@@ -207,7 +209,7 @@ void drawRays()
         rayAngle -= 2 * PI;
     }
 
-    for (int rays = 0; rays < 60; rays++)
+    for (int rays = 0; rays < maxRays; rays++)
     {
         float distHor = 100000, horX = playerPosX, horY = playerPosY;
         dof = 0;
@@ -348,45 +350,47 @@ void drawRays()
 
         distT *= cos(cosAngle);
 
-        float lineHeight = (MAP_SIZE * 320) / distT;
-        if (lineHeight > 320)
+        float lineHeight = (MAP_SIZE * screenHeight) / distT;
+        if (lineHeight > screenHeight)
         {
-            lineHeight = 320;
+            lineHeight = screenHeight;
         }
 
-        float lineOffset = 160 - lineHeight / 2;
+        float lineOffset = screenHeight / 2 - lineHeight / 2;
 
-        worldVertices[worldVerticesOffset] = rays * 8 + 530;
+        float screenScale = screenWidth / maxRays + 1;
+
+        worldVertices[worldVerticesOffset] = rays * screenScale;
         worldVertices[worldVerticesOffset + 1] = lineOffset;
         worldVertices[worldVerticesOffset + 2] = 0.1f;
         worldVertices[worldVerticesOffset + 3] = color;
         worldVertices[worldVerticesOffset + 4] = 0.1f;
 
-        worldVertices[worldVerticesOffset + 5] = rays * 8 + 530;
+        worldVertices[worldVerticesOffset + 5] = rays * screenScale;
         worldVertices[worldVerticesOffset + 6] = lineHeight + lineOffset;
         worldVertices[worldVerticesOffset + 7] = 0.1f;
         worldVertices[worldVerticesOffset + 8] = color;
         worldVertices[worldVerticesOffset + 9] = 0.1f;
 
-        worldVertices[worldVerticesOffset + 10] = rays * 8 + 538;
+        worldVertices[worldVerticesOffset + 10] = rays * screenScale + screenScale;
         worldVertices[worldVerticesOffset + 11] = lineOffset;
         worldVertices[worldVerticesOffset + 12] = 0.1f;
         worldVertices[worldVerticesOffset + 13] = color;
         worldVertices[worldVerticesOffset + 14] = 0.1f;
 
-        worldVertices[worldVerticesOffset + 15] = rays * 8 + 530;
+        worldVertices[worldVerticesOffset + 15] = rays * screenScale;
         worldVertices[worldVerticesOffset + 16] = lineHeight + lineOffset;
         worldVertices[worldVerticesOffset + 17] = 0.1f;
         worldVertices[worldVerticesOffset + 18] = color;
         worldVertices[worldVerticesOffset + 19] = 0.1f;
 
-        worldVertices[worldVerticesOffset + 20] = rays * 8 + 538;
+        worldVertices[worldVerticesOffset + 20] = rays * screenScale + screenScale;
         worldVertices[worldVerticesOffset + 21] = lineHeight + lineOffset;
         worldVertices[worldVerticesOffset + 22] = 0.1f;
         worldVertices[worldVerticesOffset + 23] = color;
         worldVertices[worldVerticesOffset + 24] = 0.1f;
 
-        worldVertices[worldVerticesOffset + 25] = rays * 8 + 538;
+        worldVertices[worldVerticesOffset + 25] = rays * screenScale + screenScale;
         worldVertices[worldVerticesOffset + 26] = lineOffset;
         worldVertices[worldVerticesOffset + 27] = 0.1f;
         worldVertices[worldVerticesOffset + 28] = color;
@@ -394,7 +398,7 @@ void drawRays()
 
         worldVerticesOffset += 30;
 
-        rayAngle += DR;
+        rayAngle += DR / 2;
 
         if (rayAngle < 0)
         {
@@ -428,7 +432,7 @@ int main()
 
     glfwSetWindowSizeCallback(window, windowSizeCallback);
 
-    //glfwSwapInterval(1);
+    glfwSwapInterval(1);
 
     gladLoadGL();
 
@@ -529,14 +533,6 @@ int main()
 
         glUseProgram(shaderID);
 
-        glBindVertexArray(minimapVAO);
-        glDrawArrays(GL_TRIANGLES, 0, sizeof(minimapVertices) / sizeof(GLfloat));
-
-        glBindVertexArray(playerVAO);
-        glBindBuffer(GL_ARRAY_BUFFER, playerVBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(playerVertices), playerVertices, GL_DYNAMIC_DRAW);
-        glDrawArrays(GL_POINTS, 0, 1);
-
         glBindVertexArray(raycastVAO);
         glBindBuffer(GL_ARRAY_BUFFER, raycastVBO);
         glBufferData(GL_ARRAY_BUFFER, sizeof(raycastVertices), raycastVertices, GL_DYNAMIC_DRAW);
@@ -547,6 +543,13 @@ int main()
         glBufferData(GL_ARRAY_BUFFER, sizeof(worldVertices), worldVertices, GL_DYNAMIC_DRAW);
         glDrawArrays(GL_TRIANGLES, 0, sizeof(worldVertices) / sizeof(GLfloat));
 
+        glBindVertexArray(minimapVAO);
+        glDrawArrays(GL_TRIANGLES, 0, sizeof(minimapVertices) / sizeof(GLfloat));
+
+        glBindVertexArray(playerVAO);
+        glBindBuffer(GL_ARRAY_BUFFER, playerVBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(playerVertices), playerVertices, GL_DYNAMIC_DRAW);
+        glDrawArrays(GL_POINTS, 0, 1);
 
         glUniformMatrix4fv(glGetUniformLocation(shaderID, "orthoMat"), 1, GL_FALSE, orthoMat);
 

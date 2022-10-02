@@ -13,7 +13,7 @@ const char* vertexShaderSource =
 
 "void main()\n"
 "{\n"
-"   gl_PointSize = 15.0;\n"
+"   gl_PointSize = 10.0;\n"
 "   color = aColor;\n"
 "   gl_Position = orthoMat * vec4(aPos.x, aPos.y, 0.0, 1.0);\n"
 "}\n\0"
