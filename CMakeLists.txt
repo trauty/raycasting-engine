@@ -8,6 +8,9 @@ add_executable(raycasting-engine
 src/main.c
 src/glad.c
 src/shader.c
+src/vector.c
+src/vertex.c
+src/bufferUtil.c
 )
 
 #target_link_options(raycasting-engine PRIVATE -mwindows)

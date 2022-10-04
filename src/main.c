@@ -5,7 +5,9 @@
 #include "glfw3.h"
 
 #include "shader.h"
+#include "vertex.h"
 #include "shaderCode.h"
+#include "bufferUtil.h"
 
 #define PI 3.14159265359
 #define DR 0.0174533
@@ -27,16 +29,13 @@ int maxRays = 180;
 
 float movementSpeed = 250.0f;
 
-GLfloat playerVertices[] = 
-{
-    512.0f, 512.0f, 0.0f, 1.0f, 0.0f
-};
+Vertex playerVertex;
 
-GLfloat minimapVertices[2048];
+Vertex minimapVertices[2048];
 
-GLfloat raycastVertices[2048];
+Vertex raycastVertices[2048];
 
-GLfloat worldVertices[5400];
+Vertex worldVertices[2048];
 
 GLfloat orthoMat[16] =
 {
@@ -139,49 +138,14 @@ void initMinimap()
             xOffset = x * MAP_SIZE / 4;
             yOffset = y * MAP_SIZE / 4;
 
-            minimapVertices[minimapArrOffset]     = xOffset;
-            minimapVertices[minimapArrOffset + 1] = yOffset;
-            
-            minimapVertices[minimapArrOffset + 2] = color;
-            minimapVertices[minimapArrOffset + 3] = color;
-            minimapVertices[minimapArrOffset + 4] = color;
-            
-            minimapVertices[minimapArrOffset + 5] = xOffset;
-            minimapVertices[minimapArrOffset + 6] = yOffset + MAP_SIZE / 4;
-            
-            minimapVertices[minimapArrOffset + 7] = color;
-            minimapVertices[minimapArrOffset + 8] = color;
-            minimapVertices[minimapArrOffset + 9] = color;
-            
-            minimapVertices[minimapArrOffset + 10] = xOffset + MAP_SIZE / 4;
-            minimapVertices[minimapArrOffset + 11] = yOffset + MAP_SIZE / 4;
-            
-            minimapVertices[minimapArrOffset + 12] = color;
-            minimapVertices[minimapArrOffset + 13] = color;
-            minimapVertices[minimapArrOffset + 14] = color;
-
-            minimapVertices[minimapArrOffset + 15] = xOffset;
-            minimapVertices[minimapArrOffset + 16] = yOffset;
-            
-            minimapVertices[minimapArrOffset + 17] = color;
-            minimapVertices[minimapArrOffset + 18] = color;
-            minimapVertices[minimapArrOffset + 19] = color;
-
-            minimapVertices[minimapArrOffset + 20] = xOffset + MAP_SIZE / 4;
-            minimapVertices[minimapArrOffset + 21] = yOffset;
-            
-            minimapVertices[minimapArrOffset + 22] = color;
-            minimapVertices[minimapArrOffset + 23] = color;
-            minimapVertices[minimapArrOffset + 24] = color;
-
-            minimapVertices[minimapArrOffset + 25] = xOffset + MAP_SIZE / 4;
-            minimapVertices[minimapArrOffset + 26] = yOffset + MAP_SIZE / 4;
-
-            minimapVertices[minimapArrOffset + 27] = color;
-            minimapVertices[minimapArrOffset + 28] = color;
-            minimapVertices[minimapArrOffset + 29] = color;
-            
-            minimapArrOffset += 30;
+            newVertex(&minimapVertices[minimapArrOffset] ,xOffset, yOffset, color, color, color);    
+            newVertex(&minimapVertices[minimapArrOffset + 1], xOffset, yOffset + MAP_SIZE / 4, color, color, color);
+            newVertex(&minimapVertices[minimapArrOffset + 2], xOffset + MAP_SIZE / 4, yOffset + MAP_SIZE / 4, color, color, color);
+            newVertex(&minimapVertices[minimapArrOffset + 3], xOffset, yOffset, color, color, color);
+            newVertex(&minimapVertices[minimapArrOffset + 4], xOffset + MAP_SIZE / 4, yOffset, color, color, color);
+            newVertex(&minimapVertices[minimapArrOffset + 5], xOffset + MAP_SIZE / 4, yOffset + MAP_SIZE / 4, color, color, color);
+        
+            minimapArrOffset += 6;
         }
     }
 }
@@ -321,21 +285,10 @@ void drawRays()
             color = 0.7f;
         }
 
-        raycastVertices[lineVerticesOffset] = playerPosX;
-        raycastVertices[lineVerticesOffset + 1] = playerPosY;
-    
-        raycastVertices[lineVerticesOffset + 2] = 0.1f;
-        raycastVertices[lineVerticesOffset + 3] = 1.0f;
-        raycastVertices[lineVerticesOffset + 4] = 0.1f;
+        newVertex(&raycastVertices[lineVerticesOffset], playerPosX, playerPosY, 0.1f, 1.0f, 0.1f);
+        newVertex(&raycastVertices[lineVerticesOffset + 1], rayX, rayY, 0.1f, 1.0f, 0.1f);
 
-        raycastVertices[lineVerticesOffset + 5] = rayX;
-        raycastVertices[lineVerticesOffset + 6] = rayY;
-    
-        raycastVertices[lineVerticesOffset + 7] = 0.1f;
-        raycastVertices[lineVerticesOffset + 8] = 1.0f;
-        raycastVertices[lineVerticesOffset + 9] = 0.1f;
-
-        lineVerticesOffset += 10;
+        lineVerticesOffset += 2;
 
         float cosAngle = playerAngle - rayAngle;
         
@@ -360,43 +313,14 @@ void drawRays()
 
         float screenScale = screenWidth / maxRays + 1;
 
-        worldVertices[worldVerticesOffset] = rays * screenScale;
-        worldVertices[worldVerticesOffset + 1] = lineOffset;
-        worldVertices[worldVerticesOffset + 2] = 0.1f;
-        worldVertices[worldVerticesOffset + 3] = color;
-        worldVertices[worldVerticesOffset + 4] = 0.1f;
+        newVertex(&worldVertices[worldVerticesOffset], rays * screenScale, lineOffset, 0.1f, color, 0.1f);
+        newVertex(&worldVertices[worldVerticesOffset + 1], rays * screenScale, lineHeight + lineOffset, 0.1f, color, 0.1f);
+        newVertex(&worldVertices[worldVerticesOffset + 2], rays * screenScale + screenScale, lineOffset, 0.1f, color, 0.1f);
+        newVertex(&worldVertices[worldVerticesOffset + 3], rays * screenScale, lineHeight + lineOffset, 0.1f, color, 0.1f);
+        newVertex(&worldVertices[worldVerticesOffset + 4], rays * screenScale + screenScale, lineHeight + lineOffset, 0.1f, color, 0.1f);
+        newVertex(&worldVertices[worldVerticesOffset + 5], rays * screenScale + screenScale, lineOffset, 0.1f, color, 0.1f);
 
-        worldVertices[worldVerticesOffset + 5] = rays * screenScale;
-        worldVertices[worldVerticesOffset + 6] = lineHeight + lineOffset;
-        worldVertices[worldVerticesOffset + 7] = 0.1f;
-        worldVertices[worldVerticesOffset + 8] = color;
-        worldVertices[worldVerticesOffset + 9] = 0.1f;
-
-        worldVertices[worldVerticesOffset + 10] = rays * screenScale + screenScale;
-        worldVertices[worldVerticesOffset + 11] = lineOffset;
-        worldVertices[worldVerticesOffset + 12] = 0.1f;
-        worldVertices[worldVerticesOffset + 13] = color;
-        worldVertices[worldVerticesOffset + 14] = 0.1f;
-
-        worldVertices[worldVerticesOffset + 15] = rays * screenScale;
-        worldVertices[worldVerticesOffset + 16] = lineHeight + lineOffset;
-        worldVertices[worldVerticesOffset + 17] = 0.1f;
-        worldVertices[worldVerticesOffset + 18] = color;
-        worldVertices[worldVerticesOffset + 19] = 0.1f;
-
-        worldVertices[worldVerticesOffset + 20] = rays * screenScale + screenScale;
-        worldVertices[worldVerticesOffset + 21] = lineHeight + lineOffset;
-        worldVertices[worldVerticesOffset + 22] = 0.1f;
-        worldVertices[worldVerticesOffset + 23] = color;
-        worldVertices[worldVerticesOffset + 24] = 0.1f;
-
-        worldVertices[worldVerticesOffset + 25] = rays * screenScale + screenScale;
-        worldVertices[worldVerticesOffset + 26] = lineOffset;
-        worldVertices[worldVerticesOffset + 27] = 0.1f;
-        worldVertices[worldVerticesOffset + 28] = color;
-        worldVertices[worldVerticesOffset + 29] = 0.1f;
-
-        worldVerticesOffset += 30;
+        worldVerticesOffset += 6;
 
         rayAngle += DR / 2;
 
@@ -442,85 +366,25 @@ int main()
 
     glEnable(GL_PROGRAM_POINT_SIZE);
 
+    playerVertex.colR = 0.1f;
+    playerVertex.colG = 0.1f;
+    playerVertex.colB = 1.0f;
+
     GLuint shaderID = createShader(vertexShaderSource, fragmentShaderSource);
 
-    GLuint playerVAO, playerVBO;
+    ArrayBuffers* playerBuffers = genArrayBuffers(&playerVertex, sizeof(playerVertex), false);
 
-    glGenVertexArrays(1, &playerVAO);
-    glGenBuffers(1, &playerVBO);
+    ArrayBuffers* minimapBuffers = genArrayBuffers(minimapVertices, sizeof(minimapVertices), false);
 
-    glBindVertexArray(playerVAO);
-    glBindBuffer(GL_ARRAY_BUFFER, playerVBO);
-
-    glBufferData(GL_ARRAY_BUFFER, sizeof(playerVertices), playerVertices, GL_DYNAMIC_DRAW);
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
-    glEnableVertexAttribArray(0);
-    glEnableVertexAttribArray(1);
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
-
-    GLuint minimapVAO, minimapVBO;
-
-    glGenVertexArrays(1, &minimapVAO);
-    glGenBuffers(1, &minimapVBO);
-
-    glBindVertexArray(minimapVAO);
-    glBindBuffer(GL_ARRAY_BUFFER, minimapVBO);
-
-    glBufferData(GL_ARRAY_BUFFER, sizeof(minimapVertices), minimapVertices, GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
-    glEnableVertexAttribArray(0);
-    glEnableVertexAttribArray(1);
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
-
-    GLuint raycastVAO, raycastVBO;
-
-    glGenVertexArrays(1, &raycastVAO);
-    glGenBuffers(1, &raycastVBO);
-
-    glBindVertexArray(raycastVAO);
-    glBindBuffer(GL_ARRAY_BUFFER, raycastVBO);
-
-    glBufferData(GL_ARRAY_BUFFER, sizeof(raycastVertices), raycastVertices, GL_DYNAMIC_DRAW);
-
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
-    glEnableVertexAttribArray(0);
-    glEnableVertexAttribArray(1);
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
-
-    GLuint worldVAO, worldVBO;
-
-    glGenVertexArrays(1, &worldVAO);
-    glGenBuffers(1, &worldVBO);
-
-    glBindVertexArray(worldVAO);
-    glBindBuffer(GL_ARRAY_BUFFER, worldVBO);
-
-    glBufferData(GL_ARRAY_BUFFER, sizeof(worldVertices), worldVertices, GL_DYNAMIC_DRAW);
-
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
-    glEnableVertexAttribArray(0);
-    glEnableVertexAttribArray(1);
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
+    ArrayBuffers* raycastLineBuffers = genArrayBuffers(raycastVertices, sizeof(raycastVertices), true);
+    
+    ArrayBuffers* worldBuffers = genArrayBuffers(worldVertices, sizeof(worldVertices), true);
 
     while (!glfwWindowShouldClose(window))
     {
         drawRays();
-        playerVertices[0] = playerPosX;
-        playerVertices[1] = playerPosY;
+        playerVertex.x = playerPosX;
+        playerVertex.y = playerPosY;
 
         glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
@@ -533,22 +397,22 @@ int main()
 
         glUseProgram(shaderID);
 
-        glBindVertexArray(raycastVAO);
-        glBindBuffer(GL_ARRAY_BUFFER, raycastVBO);
+        glBindVertexArray(raycastLineBuffers->vao);
+        glBindBuffer(GL_ARRAY_BUFFER, raycastLineBuffers->vbo);
         glBufferData(GL_ARRAY_BUFFER, sizeof(raycastVertices), raycastVertices, GL_DYNAMIC_DRAW);
         glDrawArrays(GL_LINES, 0, sizeof(raycastVertices) / sizeof(GLfloat));
 
-        glBindVertexArray(worldVAO);
-        glBindBuffer(GL_ARRAY_BUFFER, worldVBO);
+        glBindVertexArray(worldBuffers->vao);
+        glBindBuffer(GL_ARRAY_BUFFER, worldBuffers->vbo);
         glBufferData(GL_ARRAY_BUFFER, sizeof(worldVertices), worldVertices, GL_DYNAMIC_DRAW);
         glDrawArrays(GL_TRIANGLES, 0, sizeof(worldVertices) / sizeof(GLfloat));
 
-        glBindVertexArray(minimapVAO);
+        glBindVertexArray(minimapBuffers->vao);
         glDrawArrays(GL_TRIANGLES, 0, sizeof(minimapVertices) / sizeof(GLfloat));
 
-        glBindVertexArray(playerVAO);
-        glBindBuffer(GL_ARRAY_BUFFER, playerVBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(playerVertices), playerVertices, GL_DYNAMIC_DRAW);
+        glBindVertexArray(playerBuffers->vao);
+        glBindBuffer(GL_ARRAY_BUFFER, playerBuffers->vbo);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(playerVertex), &playerVertex, GL_DYNAMIC_DRAW);
         glDrawArrays(GL_POINTS, 0, 1);
 
         glUniformMatrix4fv(glGetUniformLocation(shaderID, "orthoMat"), 1, GL_FALSE, orthoMat);
@@ -556,9 +420,6 @@ int main()
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
-
-    glDeleteVertexArrays(1, &playerVAO);
-    glDeleteBuffers(1, &playerVBO);
 
     glfwDestroyWindow(window);
     glfwTerminate();

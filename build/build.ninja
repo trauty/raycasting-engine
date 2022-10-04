@@ -70,6 +70,27 @@ build CMakeFiles/raycasting-engine.dir/src/shader.c.obj: C_COMPILER__raycasting-
   OBJECT_DIR = CMakeFiles\raycasting-engine.dir
   OBJECT_FILE_DIR = CMakeFiles\raycasting-engine.dir\src
 
+build CMakeFiles/raycasting-engine.dir/src/vector.c.obj: C_COMPILER__raycasting-engine_Debug C$:/Users/traut/Desktop/Github$ Repos/raycasting-engine/src/vector.c || cmake_object_order_depends_target_raycasting-engine
+  DEP_FILE = CMakeFiles\raycasting-engine.dir\src\vector.c.obj.d
+  FLAGS = -g
+  INCLUDES = -I"C:/Users/traut/Desktop/Github Repos/raycasting-engine/include/glfw" -I"C:/Users/traut/Desktop/Github Repos/raycasting-engine/include/glad" -I"C:/Users/traut/Desktop/Github Repos/raycasting-engine/include"
+  OBJECT_DIR = CMakeFiles\raycasting-engine.dir
+  OBJECT_FILE_DIR = CMakeFiles\raycasting-engine.dir\src
+
+build CMakeFiles/raycasting-engine.dir/src/vertex.c.obj: C_COMPILER__raycasting-engine_Debug C$:/Users/traut/Desktop/Github$ Repos/raycasting-engine/src/vertex.c || cmake_object_order_depends_target_raycasting-engine
+  DEP_FILE = CMakeFiles\raycasting-engine.dir\src\vertex.c.obj.d
+  FLAGS = -g
+  INCLUDES = -I"C:/Users/traut/Desktop/Github Repos/raycasting-engine/include/glfw" -I"C:/Users/traut/Desktop/Github Repos/raycasting-engine/include/glad" -I"C:/Users/traut/Desktop/Github Repos/raycasting-engine/include"
+  OBJECT_DIR = CMakeFiles\raycasting-engine.dir
+  OBJECT_FILE_DIR = CMakeFiles\raycasting-engine.dir\src
+
+build CMakeFiles/raycasting-engine.dir/src/bufferUtil.c.obj: C_COMPILER__raycasting-engine_Debug C$:/Users/traut/Desktop/Github$ Repos/raycasting-engine/src/bufferUtil.c || cmake_object_order_depends_target_raycasting-engine
+  DEP_FILE = CMakeFiles\raycasting-engine.dir\src\bufferUtil.c.obj.d
+  FLAGS = -g
+  INCLUDES = -I"C:/Users/traut/Desktop/Github Repos/raycasting-engine/include/glfw" -I"C:/Users/traut/Desktop/Github Repos/raycasting-engine/include/glad" -I"C:/Users/traut/Desktop/Github Repos/raycasting-engine/include"
+  OBJECT_DIR = CMakeFiles\raycasting-engine.dir
+  OBJECT_FILE_DIR = CMakeFiles\raycasting-engine.dir\src
+
 
 # =============================================================================
 # Link build statements for EXECUTABLE target raycasting-engine
@@ -78,7 +99,7 @@ build CMakeFiles/raycasting-engine.dir/src/shader.c.obj: C_COMPILER__raycasting-
 #############################################
 # Link the executable raycasting-engine.exe
 
-build raycasting-engine.exe: C_EXECUTABLE_LINKER__raycasting-engine_Debug CMakeFiles/raycasting-engine.dir/src/main.c.obj CMakeFiles/raycasting-engine.dir/src/glad.c.obj CMakeFiles/raycasting-engine.dir/src/shader.c.obj | ../lib/libglfw3.a
+build raycasting-engine.exe: C_EXECUTABLE_LINKER__raycasting-engine_Debug CMakeFiles/raycasting-engine.dir/src/main.c.obj CMakeFiles/raycasting-engine.dir/src/glad.c.obj CMakeFiles/raycasting-engine.dir/src/shader.c.obj CMakeFiles/raycasting-engine.dir/src/vector.c.obj CMakeFiles/raycasting-engine.dir/src/vertex.c.obj CMakeFiles/raycasting-engine.dir/src/bufferUtil.c.obj | ../lib/libglfw3.a
   FLAGS = -g
   LINK_LIBRARIES = ../lib/libglfw3.a  -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
   OBJECT_DIR = CMakeFiles\raycasting-engine.dir
