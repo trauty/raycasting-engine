@@ -6,6 +6,7 @@
 
 #include "shader.h"
 #include "vertex.h"
+#include "vector.h"
 #include "shaderCode.h"
 #include "bufferUtil.h"
 
@@ -157,12 +158,12 @@ float dist(float ax, float ay, float bx, float by, float angle)
 
 void drawRays()
 {
-    int mapX = 0, mapY = 0, mapPos = 0, dof = 0;
-    float rayX = 0.0f, rayY = 0.0f, rayAngle = 0.0f, xOffset = 0.0f, yOffset = 0.0f, distT = 0.0f;
+    float rayAngle = 0.0f, xOffset = 0.0f, yOffset = 0.0f, distT = 0.0f;
 
     int lineVerticesOffset = 0;
     int worldVerticesOffset = 0;
 
+    
     rayAngle = playerAngle - DR * 45;
     if (rayAngle < 0)
     {
@@ -173,166 +174,138 @@ void drawRays()
         rayAngle -= 2 * PI;
     }
 
+    Vec2 rayStart; newVec2Stack(&rayStart, playerPosX, playerPosY);
+    Vec2 rayDir; newVec2Stack(&rayDir, cos(rayAngle), sin(rayAngle));
+    Vec2 rayUnitStepSize; newVec2Stack(&rayUnitStepSize, sqrt(1 + (rayDir.y / rayDir.x) * (rayDir.y / rayDir.x)), sqrt(1 + (rayDir.x / rayDir.y) * (rayDir.x / rayDir.y)));
+
+    Vec2 mapCheck; newVec2Stack(&mapCheck, (int)rayStart.x, (int)rayStart.y);
+    Vec2 rayLength1D; newVec2Stack(&rayLength1D, 0.0f, 0.0f);
+    Vec2 step; newVec2Stack(&step, 0.0f, 0.0f);
+
     for (int rays = 0; rays < maxRays; rays++)
     {
-        float distHor = 100000, horX = playerPosX, horY = playerPosY;
-        dof = 0;
-        float aTan = -1 / tan(rayAngle);
-
-        if (rayAngle > PI)
+        if (rayDir.x < 0)
         {
-            rayY = (((int)playerPosY >> 6) << 6) - 0.0001;
-            rayX = (playerPosY - rayY) * aTan + playerPosX;
-            yOffset = -64.0f;
-            xOffset = -yOffset * aTan;
-        }
-        else if (rayAngle < PI)
-        {
-            rayY = (((int)playerPosY >> 6) << 6) + 64;
-            rayX = (playerPosY - rayY) * aTan + playerPosX;
-            yOffset = 64.0f;
-            xOffset = -yOffset * aTan;
-        }
-        else if (rayAngle == 0 || rayAngle == PI)
-        {
-            rayX = playerPosX;
-            rayY = playerPosY;
-            dof = 8;
-        }
-
-        while (dof < 8)
-        {
-            mapX = (int)(rayX) >> 6;
-            mapY = (int)(rayY) >> 6;
-            mapPos = mapY * MAP_WIDTH + mapX;
-            
-            if (mapPos > 0 && mapPos < MAP_WIDTH * MAP_HEIGHT && map[mapPos] == 1)
-            {
-                horX = rayX;
-                horY = rayY;
-                distHor = dist(playerPosX, playerPosY, horX, horY, rayAngle);
-                dof = 8;
-            }
-            else
-            {
-                rayX += xOffset;
-                rayY += yOffset;
-                dof += 1;
-            }
-        }
-
-        float distVert = 100000, vertX = playerPosX, vertY = playerPosY;
-        dof = 0;
-        //Vertical check PI2 = PI / 2 , PI3 = 3 * PI / 2 
-        float nTan = -tan(rayAngle);
-
-        if (rayAngle > PI / 2 && rayAngle < 3 * PI / 2)
-        {
-            rayX = (((int)playerPosX >> 6) << 6) - 0.0001;
-            rayY = (playerPosX - rayX) * nTan + playerPosY;
-            xOffset = -64.0f;
-            yOffset = -xOffset * nTan;
-        }
-        else if (rayAngle < PI / 2 || rayAngle > 3 * PI / 2)
-        {
-            rayX = (((int)playerPosX >> 6) << 6) + 64;
-            rayY = (playerPosX - rayX) * nTan + playerPosY;
-            xOffset = 64.0f;
-            yOffset = -xOffset * nTan;
-        }
-        else if (rayAngle == 0 || rayAngle == PI)
-        {
-            rayX = playerPosX;
-            rayY = playerPosY;
-            dof = 8;
-        }
-
-        while (dof < 8)
-        {
-            mapX = (int)(rayX) >> 6;
-            mapY = (int)(rayY) >> 6;
-            mapPos = mapY * MAP_WIDTH + mapX;
-        
-            if (mapPos > 0 && mapPos < MAP_WIDTH * MAP_HEIGHT && map[mapPos] == 1)
-            {
-                vertX = rayX;
-                vertY = rayY;
-                distVert = dist(playerPosX, playerPosY, vertX, vertY, rayAngle);
-                dof = 8;
-            }
-            else
-            {
-                rayX += xOffset;
-                rayY += yOffset;
-                dof += 1;
-            }
-        }
-
-        float color = 0.0f;
-        
-        if (distVert < distHor)
-        {
-            rayX = vertX;
-            rayY = vertY;
-            distT = distVert;
-            color = 0.9f;
+            step.x = -1;
+            rayLength1D.x = (rayStart.x - mapCheck.x) * rayUnitStepSize.x;
         }
         else
         {
-            rayX = horX;
-            rayY = horY;
-            distT = distHor;
-            color = 0.7f;
+            step.x = 1;
+            rayLength1D.x = ((mapCheck.x + 1) - rayStart.x) * rayUnitStepSize.x;
+        }
+        if (rayDir.y < 0)
+        {
+            step.y = -1;
+            rayLength1D.y = (rayStart.y - mapCheck.y) * rayUnitStepSize.y;
+        }
+        else
+        {
+            step.y = 1;
+            rayLength1D.y = ((mapCheck.y + 1) - rayStart.y) * rayUnitStepSize.y;
         }
 
+        bool tileFound = false;
+        float maxDistance = 1000.0f;
+        float distance = 0.0f;
+        while (!tileFound && distance < maxDistance)
+        {
+            if (rayLength1D.x < rayLength1D.y)
+            {
+                mapCheck.x += step.x;
+                distance = rayLength1D.x;
+                rayLength1D.x += rayUnitStepSize.x;
+            }
+            else
+            {
+                mapCheck.y += step.y;
+                distance = rayLength1D.y;
+                rayLength1D.y += rayUnitStepSize.y;
+            }
+
+            if (mapCheck.x >= 0 && mapCheck.x < MAP_WIDTH && mapCheck.y >= 0 && mapCheck.y < MAP_HEIGHT)
+            {
+                if (map[(int)(mapCheck.y * MAP_WIDTH + mapCheck.x)] == 1)
+                {
+                    tileFound = true;
+                }
+            }
+        }
+
+        Vec2 intersection;
+        printf("%d \n", tileFound);
+        if (tileFound)
+        {
+            newVec2Stack(&intersection, rayStart.x + rayDir.x * distance, rayStart.y + rayDir.y * distance);
+        }
+
+        // float color = 0.0f;
+        
+        // if (distVert < distHor)
+        // {
+        //     rayX = vertX;
+        //     rayY = vertY;
+        //     distT = distVert;
+        //     color = 0.9f;
+        // }
+        // else
+        // {
+        //     rayX = horX;
+        //     rayY = horY;
+        //     distT = distHor;
+        //     color = 0.7f;
+        // }
+
         newVertex(&raycastVertices[lineVerticesOffset], playerPosX, playerPosY, 0.1f, 1.0f, 0.1f);
-        newVertex(&raycastVertices[lineVerticesOffset + 1], rayX, rayY, 0.1f, 1.0f, 0.1f);
+        newVertex(&raycastVertices[lineVerticesOffset + 1], intersection.x, intersection.y, 0.1f, 1.0f, 0.1f);
 
         lineVerticesOffset += 2;
 
-        float cosAngle = playerAngle - rayAngle;
+        // float cosAngle = playerAngle - rayAngle;
         
-        if (cosAngle < 0)
-        {
-            cosAngle += 2 * PI;
-        }
-        else if (cosAngle > 2 * PI)
-        {
-            cosAngle -= 2 * PI;
-        }
+        // if (cosAngle < 0)
+        // {
+        //     cosAngle += 2 * PI;
+        // }
+        // else if (cosAngle > 2 * PI)
+        // {
+        //     cosAngle -= 2 * PI;
+        // }
 
-        distT *= cos(cosAngle);
+        // distT *= cos(cosAngle);
 
-        float lineHeight = (MAP_SIZE * screenHeight) / distT;
-        if (lineHeight > screenHeight)
-        {
-            lineHeight = screenHeight;
-        }
+        // float lineHeight = (MAP_SIZE * screenHeight) / distT;
+        // if (lineHeight > screenHeight)
+        // {
+        //     lineHeight = screenHeight;
+        // }
 
-        float lineOffset = screenHeight / 2 - lineHeight / 2;
+        // float lineOffset = screenHeight / 2 - lineHeight / 2;
 
-        float screenScale = screenWidth / maxRays + 1;
+        // float screenScale = screenWidth / maxRays + 1;
 
-        newVertex(&worldVertices[worldVerticesOffset], rays * screenScale, lineOffset, 0.1f, color, 0.1f);
-        newVertex(&worldVertices[worldVerticesOffset + 1], rays * screenScale, lineHeight + lineOffset, 0.1f, color, 0.1f);
-        newVertex(&worldVertices[worldVerticesOffset + 2], rays * screenScale + screenScale, lineOffset, 0.1f, color, 0.1f);
-        newVertex(&worldVertices[worldVerticesOffset + 3], rays * screenScale, lineHeight + lineOffset, 0.1f, color, 0.1f);
-        newVertex(&worldVertices[worldVerticesOffset + 4], rays * screenScale + screenScale, lineHeight + lineOffset, 0.1f, color, 0.1f);
-        newVertex(&worldVertices[worldVerticesOffset + 5], rays * screenScale + screenScale, lineOffset, 0.1f, color, 0.1f);
+        // newVertex(&worldVertices[worldVerticesOffset], rays * screenScale, lineOffset, 0.1f, color, 0.1f);
+        // newVertex(&worldVertices[worldVerticesOffset + 1], rays * screenScale, lineHeight + lineOffset, 0.1f, color, 0.1f);
+        // newVertex(&worldVertices[worldVerticesOffset + 2], rays * screenScale + screenScale, lineOffset, 0.1f, color, 0.1f);
+        // newVertex(&worldVertices[worldVerticesOffset + 3], rays * screenScale, lineHeight + lineOffset, 0.1f, color, 0.1f);
+        // newVertex(&worldVertices[worldVerticesOffset + 4], rays * screenScale + screenScale, lineHeight + lineOffset, 0.1f, color, 0.1f);
+        // newVertex(&worldVertices[worldVerticesOffset + 5], rays * screenScale + screenScale, lineOffset, 0.1f, color, 0.1f);
 
-        worldVerticesOffset += 6;
+        // worldVerticesOffset += 6;
 
-        rayAngle += DR / 2;
+        // rayAngle += DR / 2;
 
-        if (rayAngle < 0)
-        {
-            rayAngle += 2 * PI;
-        }
-        else if (rayAngle > 2 * PI)
-        {
-            rayAngle -= 2 * PI;
-        }
+        // if (rayAngle < 0)
+        // {
+        //     rayAngle += 2 * PI;
+        // }
+        // else if (rayAngle > 2 * PI)
+        // {
+        //     rayAngle -= 2 * PI;
+        // }
     }
+
+    
 }
 
 int main()
@@ -360,7 +333,7 @@ int main()
 
     gladLoadGL();
 
-    initMinimap();
+   // initMinimap();
 
     glViewport(0, 0, screenWidth, screenHeight);
 
