@@ -16,6 +16,7 @@
 #define MAP_WIDTH 8
 #define MAP_HEIGHT 8
 #define MAP_SIZE 64
+#define MAP_GRID_SIZE 32
 
 GLFWwindow* window = NULL;
 
@@ -26,7 +27,7 @@ float playerDeltaX = 0.0f, playerDeltaY = 0.0f;
 float playerAngle = 0.0f;
 float rotationSpeed = 4.0f;
 
-int maxRays = 180;
+int maxRays = 1;
 
 float movementSpeed = 250.0f;
 
@@ -59,7 +60,7 @@ int map[]=
     1, 0, 0, 1, 1, 1, 0, 1,
     1, 0, 0, 1, 0, 0, 0, 1,
     1, 0, 0, 0, 0, 0, 0, 1,
-    1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1
 };
 
 void calculateDeltaTime()
@@ -151,20 +152,15 @@ void initMinimap()
     }
 }
 
-float dist(float ax, float ay, float bx, float by, float angle)
-{
-    return (sqrt((bx - ax) * (bx - ax) + (by - ay) * (by - ay)));
-}
-
 void drawRays()
 {
     float rayAngle = 0.0f, xOffset = 0.0f, yOffset = 0.0f, distT = 0.0f;
+    float rayStartX = playerPosX, rayStartY = playerPosY;
 
     int lineVerticesOffset = 0;
     int worldVerticesOffset = 0;
 
-    
-    rayAngle = playerAngle - DR * 45;
+    rayAngle = playerAngle;
     if (rayAngle < 0)
     {
         rayAngle += 2 * PI;
@@ -174,35 +170,35 @@ void drawRays()
         rayAngle -= 2 * PI;
     }
 
-    Vec2 rayStart; newVec2Stack(&rayStart, playerPosX, playerPosY);
-    Vec2 rayDir; newVec2Stack(&rayDir, cos(rayAngle), sin(rayAngle));
-    Vec2 rayUnitStepSize; newVec2Stack(&rayUnitStepSize, sqrt(1 + (rayDir.y / rayDir.x) * (rayDir.y / rayDir.x)), sqrt(1 + (rayDir.x / rayDir.y) * (rayDir.x / rayDir.y)));
-
-    Vec2 mapCheck; newVec2Stack(&mapCheck, (int)rayStart.x, (int)rayStart.y);
-    Vec2 rayLength1D; newVec2Stack(&rayLength1D, 0.0f, 0.0f);
-    Vec2 step; newVec2Stack(&step, 0.0f, 0.0f);
 
     for (int rays = 0; rays < maxRays; rays++)
     {
-        if (rayDir.x < 0)
+        float rayDirX = cos(rayAngle), rayDirY = sin(rayAngle);
+        float rayUnitStepSizeX = sqrt(1 + ((rayDirY / rayDirX) * (rayDirY / rayDirX)));
+        float rayUnitStepSizeY = sqrt(1 + ((rayDirX / rayDirY) * (rayDirX / rayDirY)));
+        int mapCheckX = (int)(rayStartX / MAP_GRID_SIZE), mapCheckY = (int)(rayStartY / MAP_GRID_SIZE);
+        float rayLength1DX = 0.0f, rayLength1DY = 0.0f;
+        float stepX = 0.0f, stepY = 0.0f;
+
+        if (rayDirX < 0)
         {
-            step.x = -1;
-            rayLength1D.x = (rayStart.x - mapCheck.x) * rayUnitStepSize.x;
+            stepX = -1;
+            rayLength1DX = (rayStartX - (float)mapCheckX) * rayUnitStepSizeX;
         }
         else
         {
-            step.x = 1;
-            rayLength1D.x = ((mapCheck.x + 1) - rayStart.x) * rayUnitStepSize.x;
+            stepX = 1;
+            rayLength1DX = (((float)mapCheckX + 1) - rayStartX) * rayUnitStepSizeX;
         }
-        if (rayDir.y < 0)
+        if (rayDirY < 0)
         {
-            step.y = -1;
-            rayLength1D.y = (rayStart.y - mapCheck.y) * rayUnitStepSize.y;
+            stepY = -1;
+            rayLength1DY = (rayStartY - (float)mapCheckY) * rayUnitStepSizeY;
         }
         else
         {
-            step.y = 1;
-            rayLength1D.y = ((mapCheck.y + 1) - rayStart.y) * rayUnitStepSize.y;
+            stepY = 1;
+            rayLength1DY = (((float)mapCheckY + 1) - rayStartY) * rayUnitStepSizeY;
         }
 
         bool tileFound = false;
@@ -210,34 +206,40 @@ void drawRays()
         float distance = 0.0f;
         while (!tileFound && distance < maxDistance)
         {
-            if (rayLength1D.x < rayLength1D.y)
+            if (rayLength1DX < rayLength1DY)
             {
-                mapCheck.x += step.x;
-                distance = rayLength1D.x;
-                rayLength1D.x += rayUnitStepSize.x;
+                mapCheckX += stepX;
+                distance = rayLength1DX;
+                rayLength1DX += rayUnitStepSizeX;
             }
             else
             {
-                mapCheck.y += step.y;
-                distance = rayLength1D.y;
-                rayLength1D.y += rayUnitStepSize.y;
+                mapCheckY += stepY;
+                distance = rayLength1DY;
+                rayLength1DY += rayUnitStepSizeY;
             }
 
-            if (mapCheck.x >= 0 && mapCheck.x < MAP_WIDTH && mapCheck.y >= 0 && mapCheck.y < MAP_HEIGHT)
+            if (mapCheckX >= 0 && mapCheckX < MAP_WIDTH && mapCheckY >= 0 && mapCheckY < MAP_HEIGHT)
             {
-                if (map[(int)(mapCheck.y * MAP_WIDTH + mapCheck.x)] == 1)
+                if (map[mapCheckY * MAP_WIDTH + mapCheckX] == 1)
                 {
                     tileFound = true;
                 }
             }
         }
 
-        Vec2 intersection;
-        printf("%d \n", tileFound);
+        float intersectionX, intersectionY;
         if (tileFound)
         {
-            newVec2Stack(&intersection, rayStart.x + rayDir.x * distance, rayStart.y + rayDir.y * distance);
+            intersectionX = rayStartX + rayDirX * distance;
+            intersectionY = rayStartY + rayDirY * distance;
         }
+
+        //printf("%f : %f \n", rayUnitStepSizeX, rayUnitStepSizeY);
+        printf("%f : %f \n", rayDirX, rayDirY);
+
+        float testX = rayStartX + rayDirX * 100.0f;
+        float testY = rayStartY + rayDirY * 100.0f;
 
         // float color = 0.0f;
         
@@ -257,9 +259,11 @@ void drawRays()
         // }
 
         newVertex(&raycastVertices[lineVerticesOffset], playerPosX, playerPosY, 0.1f, 1.0f, 0.1f);
-        newVertex(&raycastVertices[lineVerticesOffset + 1], intersection.x, intersection.y, 0.1f, 1.0f, 0.1f);
+        newVertex(&raycastVertices[lineVerticesOffset + 1], intersectionX, intersectionY, 0.1f, 1.0f, 0.1f);
+        newVertex(&raycastVertices[lineVerticesOffset + 2], playerPosX, playerPosY, 0.1f, 1.0f, 0.1f);
+        newVertex(&raycastVertices[lineVerticesOffset + 3], testX, testY, 1.0f, 0.0f, 0.1f);
 
-        lineVerticesOffset += 2;
+        lineVerticesOffset += 4;
 
         // float cosAngle = playerAngle - rayAngle;
         
@@ -293,7 +297,7 @@ void drawRays()
 
         // worldVerticesOffset += 6;
 
-        // rayAngle += DR / 2;
+        rayAngle += DR / 2;
 
         // if (rayAngle < 0)
         // {
