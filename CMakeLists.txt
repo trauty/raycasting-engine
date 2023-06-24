@@ -1,24 +1,13 @@
-cmake_minimum_required(VERSION 3.0.0)
-project(raycasting-engine)
+﻿cmake_minimum_required(VERSION 3.12)
 
-add_library(glfw STATIC IMPORTED) 
-set_target_properties(glfw PROPERTIES IMPORTED_LOCATION "${CMAKE_SOURCE_DIR}/lib/libglfw3.a")
+project("sdl2test")
 
-add_executable(raycasting-engine 
-src/main.c
-src/glad.c
-src/shader.c
-src/vector.c
-src/vertex.c
-src/bufferUtil.c
-)
+add_executable(sdl2test main.c)
 
-#target_link_options(raycasting-engine PRIVATE -mwindows)
+target_link_libraries(sdl2test ${CMAKE_SOURCE_DIR}/lib/libSDL2main.a ${CMAKE_SOURCE_DIR}/lib/libSDL2.dll.a)
 
-target_link_libraries(raycasting-engine glfw)
+if (CMAKE_VERSION VERSION_GREATER 3.12)
+  set_property(TARGET sdl2test PROPERTY CXX_STANDARD 20)
+endif()
 
-target_include_directories(raycasting-engine PRIVATE 
-${CMAKE_SOURCE_DIR}/include/glfw
-${CMAKE_SOURCE_DIR}/include/glad
-${CMAKE_SOURCE_DIR}/include/
-)
+target_include_directories(sdl2test PRIVATE ${CMAKE_SOURCE_DIR}/include)
