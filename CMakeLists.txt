@@ -1,13 +1,15 @@
-﻿cmake_minimum_required(VERSION 3.12)
+﻿cmake_minimum_required(VERSION 3.13)
 
-project("sdl2test")
+project("raycasting-engine")
 
-add_executable(sdl2test main.c)
+add_executable(raycasting-engine main.c)
 
-target_link_libraries(sdl2test ${CMAKE_SOURCE_DIR}/lib/libSDL2main.a ${CMAKE_SOURCE_DIR}/lib/libSDL2.dll.a)
+target_link_options(raycasting-engine PRIVATE ${SUBSYSTEM_LINKER_OPTIONS})
+
+target_link_libraries(raycasting-engine ${CMAKE_SOURCE_DIR}/lib/libSDL2main.a ${CMAKE_SOURCE_DIR}/lib/libSDL2.dll.a ${CMAKE_SOURCE_DIR}/lib/libSDL2_image.dll.a)
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
-  set_property(TARGET sdl2test PROPERTY CXX_STANDARD 20)
+  set_property(TARGET raycasting-engine PROPERTY C_STANDARD 11)
 endif()
 
-target_include_directories(sdl2test PRIVATE ${CMAKE_SOURCE_DIR}/include)
+target_include_directories(raycasting-engine PRIVATE ${CMAKE_SOURCE_DIR}/include)
