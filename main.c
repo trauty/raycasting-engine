@@ -19,9 +19,15 @@ float_t dir_x = -1.0f, dir_y = 0.0f;
 float_t plane_x = 0.0f, plane_y = 0.66f;
 float_t rot_speed = 4.0f;
 
+float_t delta_t = 0.0f;
+uint32_t current_time = 0.0f;
+uint32_t last_time = 0.0f;
+
 float_t player_delta_x = 0.0f, player_delta_y = 0.0f;
 
 float_t movement_speed = 4.0f;
+
+const uint8_t* keyboard;
 
 uint8_t map[MAP_WIDTH][MAP_HEIGHT] =
 {
@@ -43,7 +49,64 @@ uint8_t map[MAP_WIDTH][MAP_HEIGHT] =
 	{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
 };
 
-void raycast()
+uint32_t convert_to_arbg(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
+{
+	return (a << 24) | (r << 16) | (g << 8) | b;
+}
+
+void calc_delta_time()
+{
+	current_time = SDL_GetTicks();
+	delta_t = current_time - last_time;
+	last_time = current_time;
+}
+
+void input()
+{
+	float_t delta_rot = rot_speed * delta_t;
+
+	if (keyboard[SDLK_d])
+	{
+		float_t old_dir_x = dir_x;
+		dir_x = dir_x * cos(-delta_rot) - dir_y * sin(-delta_rot);
+		dir_y = old_dir_x * sin(-delta_rot) + dir_y * cos(-delta_rot);
+
+		float_t old_plane_x = plane_x;
+		plane_x = plane_x * cos(-delta_rot) - plane_y * sin(-delta_rot);
+		plane_y = old_plane_x * sin(-delta_rot) + plane_y * cos(-delta_rot);
+		printf("D");
+	}
+	if (keyboard[SDLK_a])
+	{
+		float_t old_dir_x = dir_x;
+		dir_x = dir_x * cos(delta_rot) - dir_y * sin(delta_rot);
+		dir_y = old_dir_x * sin(delta_rot) + dir_y * cos(delta_rot);
+
+		float_t old_plane_x = plane_x;
+		plane_x = plane_x * cos(delta_rot) - plane_y * sin(delta_rot);
+		plane_y = old_plane_x * sin(delta_rot) + plane_y * cos(delta_rot);
+		printf("A");
+	}
+
+	player_delta_x = dir_x * movement_speed * delta_t;
+	player_delta_y = dir_y * movement_speed * delta_t;
+
+	if (keyboard[SDLK_w])
+	{
+		if (map[(int)(player_x + dir_x)][(int)player_y] == 0) { player_x += player_delta_x; }
+		if (map[(int)player_x][(int)(player_y + dir_y)] == 0) { player_y += player_delta_y; }
+		printf("W");
+	}
+
+	if (keyboard[SDLK_s])
+	{
+		if (map[(int)(player_x - dir_x)][(int)player_y] == 0) { player_x -= player_delta_x; }
+		if (map[(int)player_x][(int)(player_y - dir_y)] == 0) { player_y -= player_delta_y; }
+		printf("S");
+	}
+}
+
+void raycast(uint32_t* pixel_buf)
 {
 	for (uint32_t rays = 0; rays < SCREEN_WIDTH; rays++)
 	{
@@ -61,8 +124,8 @@ void raycast()
 		float_t delta_dist_y = (ray_dir_y == 0) ? 1e30 : fabs(1.0f / ray_dir_y);
 		float_t perp_wall_dist = 0.0f;
 
-		uint8_t step_x = 0;
-		uint8_t step_y = 0;
+		int8_t step_x = 0;
+		int8_t step_y = 0;
 
 		bool hit = false;
 		bool side = false;
@@ -78,19 +141,80 @@ void raycast()
 			side_dist_x = (map_x + 1.0f - player_x) * delta_dist_x;
 		}
 
+		if (ray_dir_y < 0)
+		{
+			step_y = -1;
+			side_dist_y = (player_y - map_y) * delta_dist_y;
+		}
+		else
+		{
+			step_y = 1;
+			side_dist_y = (map_y + 1.0f - player_y) * delta_dist_y;
+		}
+
 		while (!hit)
 		{
 			if (side_dist_x < side_dist_y)
 			{
 				side_dist_x += delta_dist_x;
+				map_x += step_x;
+				side = false;
+			}
+			else
+			{
+				side_dist_y += delta_dist_y;
+				map_y += step_y;
+				side = true;
+			}
+
+			if (map[map_x][map_y] > 0)
+			{
+				hit = true;
 			}
 		}
-	}
-}
 
-uint32_t convert_to_arbg(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
-{
-	return (a << 24) | (r << 16) | (g << 8) | b;
+		if (side)
+		{
+			perp_wall_dist = (side_dist_y - delta_dist_y);
+		}
+		else
+		{
+			perp_wall_dist = (side_dist_x - delta_dist_x);
+		}
+
+		int32_t line_height = (uint32_t)(SCREEN_HEIGHT / perp_wall_dist);
+
+		int32_t draw_start = -line_height / 2 + SCREEN_HEIGHT / 2;
+
+		if (draw_start < 0)
+		{
+			draw_start = 0;
+		}
+
+		int32_t draw_end = line_height / 2 + SCREEN_HEIGHT / 2;
+
+		if (draw_end >= SCREEN_HEIGHT)
+		{
+			draw_end = SCREEN_HEIGHT - 1;
+		}
+
+		uint32_t color;
+
+		if (side)
+		{
+			color = convert_to_arbg(0, 255, 0, 255);
+		}
+		else
+		{
+			color = convert_to_arbg(0, 100, 0, 255);
+		}
+
+		for (uint32_t i = draw_start; i < draw_end; i++)
+		{
+
+			pixel_buf[rays + i * SCREEN_WIDTH] = color;
+		}
+	}
 }
 
 void render(SDL_Renderer* renderer, SDL_Texture* buf_tex)
@@ -103,7 +227,7 @@ void render(SDL_Renderer* renderer, SDL_Texture* buf_tex)
 
 	mem_offset /= sizeof(uint32_t);
 
-	//raycasting
+	raycast(mem_pointer);
 
 	SDL_UnlockTexture(buf_tex);
 
@@ -142,9 +266,14 @@ int main(int argc, char** argv)
 			bool quit = false; 
 			while (quit == false)
 			{ 
+				calc_delta_time(&e);
+				SDL_PumpEvents();
+				keyboard = SDL_GetKeyboardState(NULL);
+				input();
+				render(renderer, buf_tex);
+
 				while (SDL_PollEvent(&e)) 
 				{ 
-					render(renderer, buf_tex);
 					if (e.type == SDL_QUIT) quit = true;
 				} 
 			}

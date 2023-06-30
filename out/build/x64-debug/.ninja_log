@@ -1,6 +1,5 @@
 # ninja log v5
-12	602	7093464106059614	CMakeFiles/sdl2test.dir/main.c.obj	89fea3454eb9bdc7
-2	168	7093614080166977	CMakeFiles/raycasting-engine.dir/main.c.obj	1379831c71527d0d
-603	919	7093464109003606	sdl2test.exe	626481afcd9763d
-11	364	7093618582642509	build.ninja	db6f84982089f24
-169	469	7093614082247935	raycasting-engine.exe	9ad8f95cc039c577
+7	1725	7096384744494539	CMakeFiles/raycasting-engine.dir/main.c.obj	328126aa4b16e4be
+1729	1934	7096384746627624	raycasting-engine.exe	18f0a69dade12bfe
+27	828	7096387197703270	CMakeFiles/raycasting-engine.dir/main.c.obj	328126aa4b16e4be
+830	1004	7096387199419159	raycasting-engine.exe	18f0a69dade12bfe
