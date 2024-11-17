@@ -9,8 +9,9 @@ add_executable(
     raycasting-engine 
     src/main.c
     src/defines.h
-    src/window_win32.h
-    src/window_win32.c
+    src/platform.h
+    src/platform_win32.c
+    src/framebuffer.h
 )
 
 set_property(TARGET raycasting-engine PROPERTY C_STANDARD 99)
